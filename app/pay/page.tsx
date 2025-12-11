@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { QrCode, Copy, Link as LinkIcon, Clock } from "lucide-react";
 import { Card } from "@/app/components/ui/Card";
 import { Button } from "@/app/components/ui/Button";
-import { apiPost } from "@/app/lib/api";
+import { apiPost } from "@/app/api/directory/route";
 
 type PayLinkResponse = {
   id: string;
@@ -80,7 +80,8 @@ export default function LizardPayPage() {
         receiveChain: data.receiveChain.trim(),
         receivingAddress: data.receivingAddress.trim(),
         note: data.note?.trim() || undefined,
-        expiresInMinutes: expiresMinutes && expiresMinutes > 0 ? expiresMinutes : undefined,
+        expiresInMinutes:
+          expiresMinutes && expiresMinutes > 0 ? expiresMinutes : undefined,
       };
 
       const resp = await apiPost<PayLinkResponse>("/api/pay-links", payload);
@@ -98,7 +99,6 @@ export default function LizardPayPage() {
     } catch (err: any) {
       console.error(err);
 
-      // If backend returns Zod-like issues array
       if (Array.isArray(err?.details)) {
         err.details.forEach((issue: any) => {
           const field = issue.path?.[0] as keyof PayRequestFormValues;
@@ -142,333 +142,367 @@ export default function LizardPayPage() {
     });
 
   return (
-    <div className="space-y-8">
-      {/* Heading */}
-      <section>
-        <p className="inline-flex items-center rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-[11px] font-semibold tracking-[0.18em] uppercase text-emerald-600">
-          Lizard Pay
-        </p>
-        <h1 className="mt-2 text-3xl md:text-4xl font-semibold tracking-tight text-slate-900">
-          Request a crypto payment
-        </h1>
-        <p className="mt-2 max-w-2xl text-sm text-slate-600">
-          Set the amount you want to receive, choose token and chain, and we’ll
-          generate a one-time payment link you can share with anyone.
-        </p>
-      </section>
-
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr),minmax(0,1.4fr)]">
-        {/* Left: form */}
-        <Card className="bg-white/90">
-          <div className="px-6 md:px-8 py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div>
-              <h2 className="text-sm font-semibold text-slate-900">
-                Payment link setup
-              </h2>
-              <p className="mt-1 text-xs text-slate-500">
-                These details define what your payer sees and how much they send.
-              </p>
-            </div>
-            <div className="flex items-center gap-2 text-[11px] text-slate-500">
-              <span className="inline-flex items-center rounded-full bg-slate-50 px-2.5 py-1 ring-1 ring-slate-100">
-                Required fields marked with{" "}
-                <span className="ml-1 text-red-500">*</span>
-              </span>
-            </div>
+    <div className="mx-auto max-w-6xl px-4 md:px-6 py-10 lg:py-16">
+      {/* 2-column layout like Houdini: left = hero text, right = widget card */}
+      <div className="grid gap-10 lg:grid-cols-2 lg:items-start">
+        {/* LEFT: marketing / explanation column */}
+        <section className="space-y-6">
+          <div>
+            <p className="inline-flex items-center rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-[11px] font-semibold tracking-[0.18em] uppercase text-emerald-600">
+              Lizard Pay
+            </p>
+            <h1 className="mt-3 text-3xl md:text-4xl font-semibold tracking-tight text-slate-900">
+              Get paid in crypto with one link.
+            </h1>
+            <p className="mt-3 max-w-xl text-sm text-slate-600">
+              Generate a single payment link that encodes your amount,
+              token, chain and address. Share it with anyone — they can
+              pay you from any wallet or device.
+            </p>
           </div>
 
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="px-6 md:px-8 py-6 space-y-6"
-          >
-            {submitError && (
-              <div className="p-3 text-sm rounded-2xl border border-red-200 bg-red-50 text-red-700">
-                {submitError}
+          <div className="grid gap-4 text-sm text-slate-600">
+            <div className="flex gap-3">
+              <div className="mt-1 h-6 w-6 flex items-center justify-center rounded-full bg-emerald-50 text-[11px] font-semibold text-emerald-700">
+                1
               </div>
-            )}
-
-            {/* Amount + token */}
-            <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-slate-800 mb-1.5">
-                  Amount to receive <span className="text-red-500">*</span>
-                </label>
-                <input
-                  {...register("amountToReceive", { required: "Required" })}
-                  type="text"
-                  className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  placeholder="250.00"
-                />
-                {errors.amountToReceive && (
-                  <p className="mt-1 text-xs text-red-500">
-                    {errors.amountToReceive.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-800 mb-1.5">
-                  Token to receive <span className="text-red-500">*</span>
-                </label>
-                <input
-                  {...register("receiveToken", { required: "Required" })}
-                  type="text"
-                  className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  placeholder="USDC, USDT, DAI…"
-                />
-                {errors.receiveToken && (
-                  <p className="mt-1 text-xs text-red-500">
-                    {errors.receiveToken.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Chain + address */}
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium text-slate-800 mb-1.5">
-                  Chain to receive on <span className="text-red-500">*</span>
-                </label>
-                <input
-                  {...register("receiveChain", { required: "Required" })}
-                  type="text"
-                  className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  placeholder="Ethereum, Arbitrum, Polygon…"
-                />
-                {errors.receiveChain && (
-                  <p className="mt-1 text-xs text-red-500">
-                    {errors.receiveChain.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-800 mb-1.5">
-                  Receiving address <span className="text-red-500">*</span>
-                </label>
-                <input
-                  {...register("receivingAddress", {
-                    required: "Required",
-                    minLength: {
-                      value: 10,
-                      message: "Address looks too short",
-                    },
-                  })}
-                  type="text"
-                  className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-mono"
-                  placeholder="0x..."
-                />
-                {errors.receivingAddress && (
-                  <p className="mt-1 text-xs text-red-500">
-                    {errors.receivingAddress.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Note */}
-            <div>
-              <label className="block text-sm font-medium text-slate-800 mb-1.5">
-                Note for payer (optional)
-              </label>
-              <textarea
-                {...register("note")}
-                rows={3}
-                className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                placeholder="Example: Payment for invoice #123, March 2025 subscription…"
-              />
-            </div>
-
-            {/* Expiry */}
-            <div className="grid gap-4 md:grid-cols-2 items-end">
-              <div>
-                <label className="block text-sm font-medium text-slate-800 mb-1.5">
-                  Link expiry (minutes, optional)
-                </label>
-                <input
-                  {...register("expiresInMinutes")}
-                  type="number"
-                  min={1}
-                  className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  placeholder="30"
-                />
-                <p className="mt-1 text-[11px] text-slate-500">
-                  After expiry, the link will show as inactive to payers.
+                <h3 className="text-sm font-semibold text-slate-900">
+                  Configure what you want to receive
+                </h3>
+                <p className="mt-1 text-xs text-slate-600">
+                  Choose token, chain and your receiving address. Optionally
+                  add a note and link expiry.
                 </p>
               </div>
             </div>
 
-            {/* CTA */}
-            <div className="pt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="inline-flex items-center justify-center px-5 py-2.5 rounded-full"
-              >
-                {isSubmitting ? "Generating link…" : "Generate payment link"}
-              </Button>
+            <div className="flex gap-3">
+              <div className="mt-1 h-6 w-6 flex items-center justify-center rounded-full bg-emerald-50 text-[11px] font-semibold text-emerald-700">
+                2
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-slate-900">
+                  Send your unique payment link
+                </h3>
+                <p className="mt-1 text-xs text-slate-600">
+                  Copy the link and share it in email, chat or invoice.
+                  Payers open it in any browser or wallet.
+                </p>
+              </div>
+            </div>
 
-              <p className="text-[11px] text-slate-500">
-                We’ll return a one-time link your users can open in any browser or
-                wallet.
+            <div className="flex gap-3">
+              <div className="mt-1 h-6 w-6 flex items-center justify-center rounded-full bg-emerald-50 text-[11px] font-semibold text-emerald-700">
+                3
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-slate-900">
+                  Get paid directly to your wallet
+                </h3>
+                <p className="mt-1 text-xs text-slate-600">
+                  Funds go straight to the address you specify. No custody,
+                  no pooled accounts.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* RIGHT: main widget card (form + preview in same card) */}
+        <Card className="bg-white/95 shadow-sm">
+          {/* Card header */}
+          <div className="px-5 md:px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <h2 className="text-sm font-semibold text-slate-900">
+                Create payment request
+              </h2>
+              <p className="mt-1 text-xs text-slate-500">
+                Define how much you want to receive and where, then we’ll
+                generate a shareable link + QR.
               </p>
             </div>
-          </form>
-        </Card>
+            <div className="flex items-center gap-2 text-[11px] text-slate-500">
+              <span className="inline-flex items-center rounded-full bg-slate-50 px-2.5 py-1 ring-1 ring-slate-100">
+                Required fields{" "}
+                <span className="ml-1 text-red-500 font-semibold">*</span>
+              </span>
+            </div>
+          </div>
 
-        {/* Right: generated link + QR */}
-        <div className="space-y-4">
-          <Card className="p-5 bg-white/90">
-            <h3 className="text-sm font-semibold text-slate-900 mb-1">
-              Payment link
-            </h3>
-            <p className="text-xs text-slate-500 mb-3">
-              Once generated, share this link with your customer. They’ll see a
-              pay screen with amount, token, chain and QR code.
-            </p>
-
-            {!createdLink && (
-              <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-4 text-xs text-slate-500">
-                Fill the form and click{" "}
-                <span className="font-medium text-slate-700">
-                  Generate payment link
-                </span>{" "}
-                to create a new pay link.
-              </div>
-            )}
-
-            {createdLink && (
-              <div className="space-y-4">
-                {/* URL card */}
-                <div className="rounded-2xl bg-slate-900 text-slate-50 p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-emerald-300">
-                      Share this link
-                    </span>
-                    {expiresLabel && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-slate-800 px-2 py-1 text-[11px] text-slate-200">
-                        <Clock className="h-3 w-3" />
-                        Expires {expiresLabel}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <code className="block max-w-full truncate rounded-xl bg-slate-800 px-3 py-2 text-[11px]">
-                      {createdLink.paymentUrl}
-                    </code>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        className="flex items-center gap-1 bg-white/10 text-slate-50 ring-1 ring-slate-400 hover:bg-white/20"
-                        onClick={() =>
-                          handleCopy(createdLink.paymentUrl, "url")
-                        }
-                      >
-                        <Copy className="h-3 w-3" />
-                        {copiedUrl ? "Copied" : "Copy link"}
-                      </Button>
-                      <div className="text-[11px] text-slate-300 flex items-center gap-1">
-                        <LinkIcon className="h-3 w-3" />
-                        Anyone with this link can see the payment request.
-                      </div>
-                    </div>
-                  </div>
+          {/* Card body: 2-column widget layout inside */}
+          <div className="px-5 md:px-6 py-5">
+            <div className="space-y-4">
+              {submitError && (
+                <div className="p-3 text-sm rounded-2xl border border-red-200 bg-red-50 text-red-700">
+                  {submitError}
                 </div>
+              )}
 
-                {/* Receiving config + QR placeholder */}
-                <div className="grid gap-3 md:grid-cols-[minmax(0,1.4fr),minmax(0,1fr)]">
-                  <div className="rounded-2xl bg-slate-50 p-3 flex flex-col gap-2">
-                    <span className="text-[11px] font-medium text-slate-700">
-                      You’ll receive
-                    </span>
-                    <div className="text-lg font-semibold text-slate-900">
-                      {createdLink.payLink.amountToReceive.toLocaleString(
-                        undefined,
-                        { maximumFractionDigits: 6 }
-                      )}{" "}
-                      <span className="text-sm text-slate-500">
-                        {createdLink.payLink.receiveToken}
-                      </span>
-                    </div>
-                    <div className="text-[11px] text-slate-500">
-                      On{" "}
-                      <span className="font-medium">
-                        {createdLink.payLink.receiveChain}
-                      </span>
+              {/* Inside the card: grid like Houdini – left form, right preview */}
+              <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr),minmax(0,1.1fr)] items-start">
+                {/* FORM COLUMN */}
+                <form
+                  onSubmit={handleSubmit(onSubmit)}
+                  className="space-y-5"
+                >
+                  {/* Amount + token */}
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-800 mb-1.5">
+                        Amount to receive{" "}
+                        <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        {...register("amountToReceive", {
+                          required: "Required",
+                        })}
+                        type="text"
+                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        placeholder="250.00"
+                      />
+                      {errors.amountToReceive && (
+                        <p className="mt-1 text-xs text-red-500">
+                          {errors.amountToReceive.message}
+                        </p>
+                      )}
                     </div>
 
-                    <div className="mt-2 space-y-1">
-                      <span className="text-[11px] font-medium text-slate-700">
-                        Receiving address
-                      </span>
-                      <code className="block max-w-full truncate rounded-xl bg-slate-900 px-3 py-2 text-[11px] text-emerald-100">
-                        {createdLink.payLink.receivingAddress}
-                      </code>
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        className="mt-1 inline-flex items-center gap-1"
-                        onClick={() =>
-                          handleCopy(
-                            createdLink.payLink.receivingAddress,
-                            "address"
-                          )
-                        }
-                      >
-                        <Copy className="h-3 w-3" />
-                        {copiedAddress ? "Copied" : "Copy address"}
-                      </Button>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-800 mb-1.5">
+                        Token to receive{" "}
+                        <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        {...register("receiveToken", {
+                          required: "Required",
+                        })}
+                        type="text"
+                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        placeholder="USDC, USDT, DAI…"
+                      />
+                      {errors.receiveToken && (
+                        <p className="mt-1 text-xs text-red-500">
+                          {errors.receiveToken.message}
+                        </p>
+                      )}
                     </div>
                   </div>
 
-                  <div className="rounded-2xl bg-slate-900/95 flex flex-col items-center justify-center gap-2 p-3 text-center">
-                    <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-slate-800">
-                      {/* Placeholder for actual QR code */}
-                      <QrCode className="h-12 w-12 text-emerald-300" />
+                  {/* Chain + address */}
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-800 mb-1.5">
+                        Chain to receive on{" "}
+                        <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        {...register("receiveChain", {
+                          required: "Required",
+                        })}
+                        type="text"
+                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        placeholder="Ethereum, Arbitrum, Polygon…"
+                      />
+                      {errors.receiveChain && (
+                        <p className="mt-1 text-xs text-red-500">
+                          {errors.receiveChain.message}
+                        </p>
+                      )}
                     </div>
-                    <p className="text-[11px] text-slate-300">
-                      On the payer page, this will be a real QR with amount +
-                      address for their wallet.
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-800 mb-1.5">
+                        Receiving address{" "}
+                        <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        {...register("receivingAddress", {
+                          required: "Required",
+                          minLength: {
+                            value: 10,
+                            message: "Address looks too short",
+                          },
+                        })}
+                        type="text"
+                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-mono"
+                        placeholder="0x..."
+                      />
+                      {errors.receivingAddress && (
+                        <p className="mt-1 text-xs text-red-500">
+                          {errors.receivingAddress.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Note */}
+                  <div>
+                    <label className="block text-sm font-medium text-slate-800 mb-1.5">
+                      Note for payer (optional)
+                    </label>
+                    <textarea
+                      {...register("note")}
+                      rows={3}
+                      className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      placeholder="Example: Payment for invoice #123, March 2025 subscription…"
+                    />
+                  </div>
+
+                  {/* Expiry */}
+                  <div>
+                    <label className="block text-sm font-medium text-slate-800 mb-1.5">
+                      Link expiry (minutes, optional)
+                    </label>
+                    <input
+                      {...register("expiresInMinutes")}
+                      type="number"
+                      min={1}
+                      className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      placeholder="30"
+                    />
+                    <p className="mt-1 text-[11px] text-slate-500">
+                      After expiry, the link will show as inactive to payers.
                     </p>
                   </div>
+
+                  {/* CTA */}
+                  <div className="pt-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="inline-flex items-center justify-center px-5 py-2.5 rounded-full"
+                    >
+                      {isSubmitting ? "Generating link…" : "Generate payment link"}
+                    </Button>
+                    <p className="text-[11px] text-slate-500">
+                      We&apos;ll return a one-time link your users can open in any
+                      browser or wallet.
+                    </p>
+                  </div>
+                </form>
+
+                {/* PREVIEW COLUMN */}
+                <div className="space-y-3">
+                  <h3 className="text-xs font-semibold text-slate-600 uppercase tracking-[0.16em]">
+                    Preview
+                  </h3>
+
+                  {!createdLink && (
+                    <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-4 text-xs text-slate-500">
+                      Fill the form and click{" "}
+                      <span className="font-medium text-slate-700">
+                        Generate payment link
+                      </span>{" "}
+                      to see a live preview of the payer view.
+                    </div>
+                  )}
+
+                  {createdLink && (
+                    <div className="space-y-4">
+                      {/* URL card */}
+                      <div className="rounded-2xl bg-slate-900 text-slate-50 p-4 space-y-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-emerald-300">
+                            Share this link
+                          </span>
+                          {expiresLabel && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-slate-800 px-2 py-1 text-[11px] text-slate-200">
+                              <Clock className="h-3 w-3" />
+                              Expires {expiresLabel}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="space-y-2">
+                          <code className="block max-w-full truncate rounded-xl bg-slate-800 px-3 py-2 text-[11px]">
+                            {createdLink.paymentUrl}
+                          </code>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              className="flex items-center gap-1 bg-white/10 text-slate-50 ring-1 ring-slate-400 hover:bg-white/20"
+                              onClick={() =>
+                                handleCopy(createdLink.paymentUrl, "url")
+                              }
+                            >
+                              <Copy className="h-3 w-3" />
+                              {copiedUrl ? "Copied" : "Copy link"}
+                            </Button>
+                            <div className="text-[11px] text-slate-300 flex items-center gap-1">
+                              <LinkIcon className="h-3 w-3" />
+                              Anyone with this link can see the payment request.
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Receiving config + QR */}
+                      <div className="grid gap-3 md:grid-cols-[minmax(0,1.4fr),minmax(0,1fr)]">
+                        <div className="rounded-2xl bg-slate-50 p-3 flex flex-col gap-2">
+                          <span className="text-[11px] font-medium text-slate-700">
+                            You&apos;ll receive
+                          </span>
+                          <div className="text-lg font-semibold text-slate-900">
+                            {createdLink.payLink.amountToReceive.toLocaleString(
+                              undefined,
+                              { maximumFractionDigits: 6 }
+                            )}{" "}
+                            <span className="text-sm text-slate-500">
+                              {createdLink.payLink.receiveToken}
+                            </span>
+                          </div>
+                          <div className="text-[11px] text-slate-500">
+                            On{" "}
+                            <span className="font-medium">
+                              {createdLink.payLink.receiveChain}
+                            </span>
+                          </div>
+
+                          <div className="mt-2 space-y-1">
+                            <span className="text-[11px] font-medium text-slate-700">
+                              Receiving address
+                            </span>
+                            <code className="block max-w-full truncate rounded-xl bg-slate-900 px-3 py-2 text-[11px] text-emerald-100">
+                              {createdLink.payLink.receivingAddress}
+                            </code>
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              className="mt-1 inline-flex items-center gap-1"
+                              onClick={() =>
+                                handleCopy(
+                                  createdLink.payLink.receivingAddress,
+                                  "address"
+                                )
+                              }
+                            >
+                              <Copy className="h-3 w-3" />
+                              {copiedAddress ? "Copied" : "Copy address"}
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div className="rounded-2xl bg-slate-900/95 flex flex-col items-center justify-center gap-2 p-3 text-center">
+                          <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-slate-800">
+                            <QrCode className="h-12 w-12 text-emerald-300" />
+                          </div>
+                          <p className="text-[11px] text-slate-300">
+                            On the payer page, this will be a real QR with amount +
+                            address for their wallet.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-            )}
-          </Card>
-
-          {/* How it works */}
-          <Card className="p-5 bg-white/80">
-            <h3 className="text-sm font-semibold text-slate-900 mb-2">
-              How this maps to Houdini Pay
-            </h3>
-            <ol className="space-y-2 text-xs text-slate-600 list-decimal list-inside">
-              <li>
-                You set{" "}
-                <span className="font-medium">
-                  amount, token, chain and address
-                </span>{" "}
-                you want to receive.
-              </li>
-              <li>
-                Backend creates a{" "}
-                <span className="font-medium">payment link</span> with a unique
-                ID and expiry.
-              </li>
-              <li>
-                Your customer opens the link and sees a pay screen (we’ll build
-                this at <code className="bg-slate-100 px-1 rounded">
-                  /pay/[id]
-                </code>{" "}
-                next), where they send funds from any supported wallet.
-              </li>
-            </ol>
-          </Card>
-        </div>
+            </div>
+          </div>
+        </Card>
       </div>
     </div>
   );

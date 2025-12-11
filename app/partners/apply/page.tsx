@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { ShieldCheck, ExternalLink } from "lucide-react";
-import { apiPost, apiGet } from "@/app/lib/api";
+import { apiPost, apiGet } from "@/app/api/directory/route";
 import { Card } from "@/app/components/ui/Card";
 import { Button } from "@/app/components/ui/Button";
 

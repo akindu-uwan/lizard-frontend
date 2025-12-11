@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ShieldCheck, ExternalLink } from "lucide-react";
-import { apiGet } from "@/app/lib/api";
+import { apiGet } from "@/app/api/directory/route";
 import { Card } from "@/app/components/ui/Card";
 import { Button } from "@/app/components/ui/Button";
 
@@ -26,7 +26,9 @@ export default function PartnersPage() {
       try {
         setLoading(true);
         setError(null);
-        const data = await apiGet<Partner[]>("/api/partners?status=approved");
+
+        // remove generic type argument OR make apiGet generic
+        const data: Partner[] = await apiGet("/api/partners");
         setPartners(data);
       } catch (err: any) {
         console.error(err);
@@ -51,16 +53,15 @@ export default function PartnersPage() {
           </h1>
           <p className="mt-2 max-w-2xl text-sm text-slate-600">
             Protocols, DEXes, bridges and tools that Lizard can route through.
-            Approved partners appear both here and in the services directory.
           </p>
         </div>
 
         <div className="flex flex-col items-start md:items-end gap-2">
-          <Button asChild size="sm" className="px-4 py-2 rounded-full">
-            <Link href="/partners/apply">
+          <Link href="/partners/apply">
+            <Button size="sm" className="px-4 py-2 rounded-full">
               Become a routing partner
-            </Link>
-          </Button>
+            </Button>
+          </Link>
           <p className="text-[11px] text-slate-500 max-w-xs text-left md:text-right">
             Fill out a short application and our team will review your protocol
             for integration.
@@ -87,7 +88,7 @@ export default function PartnersPage() {
         {!loading && !error && partners.length > 0 && (
           <div className="space-y-3">
             <p className="text-xs text-slate-500">
-              {partners.length} partner{partners.length > 1 ? "s" : ""} integrated.
+              {partners.length} partner{partners.length > 1 ? "s" : ""}
             </p>
 
             <div className="grid gap-3 md:grid-cols-2">
@@ -97,7 +98,7 @@ export default function PartnersPage() {
                   className="flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3"
                 >
                   <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-linear-to-br from-emerald-200 via-sky-200 to-purple-200 text-xs font-semibold text-slate-800">
-                    {partner.projectName[0]}
+                    {partner.projectName?.[0]?.toUpperCase() ?? "?"}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between gap-2">

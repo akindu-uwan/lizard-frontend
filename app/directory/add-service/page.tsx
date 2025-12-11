@@ -4,7 +4,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown, PlusCircle } from "lucide-react";
 import Link from "next/link";
-import { apiPost } from "@/app/lib/api";
+import { apiPost } from "@/app/api/directory/route";
 
 type ServiceType = "exchange" | "wallet" | "vpn" | "hosting" | "other" | "aggregator" | "bridge" | "tool";
 
@@ -66,11 +66,11 @@ export default function AddServicePage() {
 
     try {
       setLoading(true);
-      const createdService = await apiPost("/api/services", payload);
+      const createdService = await apiPost("/api/services/request", payload);
       setSuccess(`Service "${createdService.name}" created successfully!`);
 
       setTimeout(() => {
-        router.push("/");
+        router.push("/directory");
       }, 1500);
     } catch (err: any) {
       setError(err.message || "Failed to create service");

@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect } from "react";
 import { ChevronDown, Search, ShieldCheck } from "lucide-react";
-import { apiGet } from '@/app/lib/api';
+import { apiGet } from '@/app/api/directory/route';
 import { Service } from '@/app/types/service';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -16,7 +16,7 @@ export default function DirectoryPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("score_desc");
   const [selectedTypes, setSelectedTypes] = useState<ServiceType[]>([]);
-  const [showVerified, setShowVerified] = useState(true);
+  const [showVerified, setShowVerified] = useState("");
 
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
@@ -229,7 +229,7 @@ export default function DirectoryPage() {
               Verified Services Directory
             </h1>
             <p className="text-xs text-slate-500">
-              {loading ? "Loading..." : error ? "Error" : `${results.length} results`} • Powered by your backend
+              {loading ? "Loading..." : error ? "Error" : `${results.length} results`}
             </p>
           </div>
 

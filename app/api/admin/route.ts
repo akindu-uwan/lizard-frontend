@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
-  withCredentials: true, // Important for cookies
+  withCredentials: true,
 });
 
 // Add auth check interceptor
@@ -30,9 +30,15 @@ export const authApi = {
 };
 
 export const tokenAdminApi = {
-  getRequests: () => api.get('/api/admin/tokens/requests'),
+  getRequests: () => api.get('/api/tokens/request'),
   updateRequest: (id: number, status: string) =>
-    api.put(`/api/admin/tokens/requests/${id}`, { status }),
+    api.put(`/api/tokens/request/${id}`, { status }),
+};
+
+export const serviceAdminApi = {
+  getServices: () => api.get('/api/services/request'),
+  updateServices: (id: number, status: string) =>
+    api.put(`/api/services/request/${id}`, { status }),
 };
 
 export const partnerAdminApi = {

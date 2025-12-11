@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
-import { authApi } from '@/app/api/api';
+import { authApi } from '@/app/api/admin/route';
 
 type LoginForm = {
   email: string;
