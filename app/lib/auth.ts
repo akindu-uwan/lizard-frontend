@@ -18,5 +18,5 @@ export async function me() {
 }
 
 export async function logout() {
-  return apiPost<{ ok: boolean }>("/api/auth/logout");
+  return apiPost<{ ok: boolean }>("/api/auth/logout", {});
 }
