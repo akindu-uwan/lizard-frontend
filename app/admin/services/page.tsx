@@ -10,7 +10,7 @@ interface ServiceRequest {
   slug: string;
   type: string;
   url: string;
-  verificationStatus: 'verified' | 'approved' | 'community' | 'scam';
+  verificationStatus: 'verified' | 'approved' | 'community';
   createdAt: string;
 }
 
@@ -50,8 +50,6 @@ export default function ServicesAdminPage() {
         return 'bg-emerald-100 text-emerald-800';
       case 'approved':
         return 'bg-blue-100 text-blue-800';
-      case 'scam':
-        return 'bg-red-100 text-red-800';
       default:
         return 'bg-amber-100 text-amber-800';
     }
@@ -68,6 +66,12 @@ export default function ServicesAdminPage() {
 
   return (
     <div className="p-8">
+      <button
+          onClick={() => router.push('/admin')}
+          className="mb-4 inline-flex items-center text-sm font-medium text-slate-700 hover:text-slate-900"
+        >
+          ← Back to Dashboard
+        </button>
       <h1 className="text-2xl font-bold text-slate-900 mb-2">Service Listings</h1>
       <p className="text-slate-600 mb-6">Manage services submitted to your platform</p>
 
@@ -103,23 +107,9 @@ export default function ServicesAdminPage() {
                     View
                   </button>
 
-                  {service.verificationStatus !== 'verified' && (
-                    <button
-                      onClick={() => updateStatus(service._id, 'verified')}
-                      className="px-3 py-1 text-xs font-medium text-white bg-emerald-600 rounded hover:bg-emerald-700"
-                    >
-                      Verify
-                    </button>
-                  )}
+                  
 
-                  {service.verificationStatus !== 'scam' && (
-                    <button
-                      onClick={() => updateStatus(service._id, 'scam')}
-                      className="px-3 py-1 text-xs font-medium text-white bg-red-600 rounded hover:bg-red-700"
-                    >
-                      Mark Scam
-                    </button>
-                  )}
+                  
                 </td>
               </tr>
             ))}

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
-import { authApi } from '@/app/api/admin/route';
+import { keyAuthApi } from "@/app/api/admin/route";
 
 type LoginForm = {
   email: string;
@@ -29,7 +29,7 @@ export default function AdminLoginPage() {
     setSubmitError(null);
 
     try {
-      await authApi.login(data.email, data.password);
+      await keyAuthApi.login(data.email, data.password);
       router.push(redirectTo);
     } catch (error: any) {
       setSubmitError(

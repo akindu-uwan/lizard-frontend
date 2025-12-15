@@ -57,6 +57,12 @@ export default function TokenAdminPage() {
 
   return (
     <div className="p-8">
+      <button
+          onClick={() => router.push('/admin')}
+          className="mb-4 inline-flex items-center text-sm font-medium text-slate-700 hover:text-slate-900"
+        >
+          ← Back to Dashboard
+        </button>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-900">Token Listing Requests</h1>
         <p className="text-slate-600">Review and manage token listing requests</p>

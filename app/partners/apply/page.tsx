@@ -72,61 +72,64 @@ export default function PartnerApplyPage() {
   }, []);
 
   const onSubmit = async (data: PartnerSignupFormValues) => {
-    setIsSubmitting(true);
-    setSubmitError(null);
-    setSubmitted(false);
+  setIsSubmitting(true);
+  setSubmitError(null);
+  setSubmitted(false);
 
-    try {
-      const payload = {
-        ...data,
-        website: data.website.trim(),
-        apiBaseUrl: data.apiBaseUrl?.trim() || undefined,
-        apiDocsUrl: data.apiDocsUrl?.trim() || undefined,
-      };
+  try {
+    const SERVICE_MAP: Record<string, string> = {
+      DEX: "DEX",
+      AGGREGATOR: "Aggregator",
+      BRIDGE: "Bridge",
+      LENDING: "Lending",
+      WALLET: "Wallet",
+      OTHER: "Other",
+    };
 
-      await apiPost("/api/partners/apply", payload);
+    const normalizedService =
+      SERVICE_MAP[String(data.serviceType).trim().toUpperCase()] || data.serviceType;
 
-      setSubmitted(true);
-      reset({
-        projectName: "",
-        companyName: "",
-        serviceType: "DEX",
-        primaryChain: "",
-        supportedChains: "",
-        website: "",
-        apiBaseUrl: "",
-        apiDocsUrl: "",
-        contactName: "",
-        contactEmail: "",
-        telegram: "",
-        discord: "",
-        estimatedDailyVolume: "",
-        notes: "",
-        acceptTerms: false,
-      });
-    } catch (err: any) {
-      console.error(err);
+    const payload = {
+      ...data,
+      serviceType: normalizedService,
+      website: data.website.trim(),
+      apiBaseUrl: data.apiBaseUrl?.trim() || "",
+      apiDocsUrl: data.apiDocsUrl?.trim() || "",
+      companyName: data.companyName?.trim() || "",
+      supportedChains: data.supportedChains?.trim() || "",
+      telegram: data.telegram?.trim() || "",
+      discord: data.discord?.trim() || "",
+      estimatedDailyVolume: data.estimatedDailyVolume?.trim() || "",
+      notes: data.notes?.trim() || "",
+    };
 
-      if (Array.isArray(err?.details)) {
-        err.details.forEach((issue: any) => {
-          const field = issue.path?.[0] as keyof PartnerSignupFormValues;
-          if (!field) return;
-          setError(field, {
-            type: "server",
-            message: issue.message || "Invalid value",
-          });
+    await apiPost("/api/partnerrequests/apply", payload);
+
+    setSubmitted(true);
+    reset();
+  } catch (err: any) {
+    console.error(err);
+
+    if (Array.isArray(err?.details)) {
+      err.details.forEach((issue: any) => {
+        const field = issue.path?.[0] as keyof PartnerSignupFormValues;
+        if (!field) return;
+        setError(field, {
+          type: "server",
+          message: issue.message || "Invalid value",
         });
-        setSubmitError("Please fix the highlighted fields.");
-      } else {
-        setSubmitError(
-          err?.message ||
-            "Something went wrong while submitting your application."
-        );
-      }
-    } finally {
-      setIsSubmitting(false);
+      });
+      setSubmitError("Please fix the highlighted fields.");
+    } else {
+      setSubmitError(
+        err?.message || "Something went wrong while submitting your application."
+      );
     }
-  };
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   return (
     <div className="space-y-8">

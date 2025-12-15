@@ -4,7 +4,7 @@ import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { serviceAdminApi } from '@/app/api/admin/route';
 
-type VerificationStatus = 'verified' | 'approved' | 'community' | 'scam';
+type VerificationStatus = 'verified' | 'approved' | 'community';
 
 interface ServiceRequest {
   _id: string;
@@ -24,6 +24,11 @@ interface ServiceRequest {
   updatedAt: string;
 }
 
+interface ServiceConfirmed {
+  _id: string;
+  slug: string;
+}
+
 interface DetailProps {
   params: Promise<{ id: string }>;
 }
@@ -36,29 +41,93 @@ export default function ServiceDetailPage({ params }: DetailProps) {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
 
+  // -----------------------------
+  // Fetch service by ID
+  // -----------------------------
   useEffect(() => {
-    async function load() {
+    const fetchService = async () => {
       try {
         const res = await serviceAdminApi.getServiceById(id);
-        setService(res.data);
+        setService(res?.data ?? null);
       } catch (err) {
-        console.error('Error loading service:', err);
+        console.error('Failed to fetch service:', err);
         setService(null);
       } finally {
         setLoading(false);
       }
-    }
-    load();
+    };
+
+    fetchService();
   }, [id]);
 
-  const updateStatus = async (status: VerificationStatus) => {
+  // -----------------------------
+  // Verify & Publish
+  // -----------------------------
+  const verifyAndPublish = async () => {
     if (!service) return;
+
     try {
       setUpdating(true);
-      await serviceAdminApi.updateService(service._id, { verificationStatus: status });
-      setService({ ...service, verificationStatus: status });
+
+      // 1) Mark request as verified
+      const verifiedRes = await serviceAdminApi.updateServices(service._id, {
+        verificationStatus: 'verified',
+      });
+
+      const verifiedService: ServiceRequest =
+        verifiedRes?.data ?? { ...service, verificationStatus: 'verified' };
+
+      // 2) Prepare publish payload
+      const payload = {
+        name: verifiedService.name,
+        slug: verifiedService.slug,
+        type: verifiedService.type,
+        url: verifiedService.url,
+        description: verifiedService.description || '',
+        privacyScore: verifiedService.privacyScore ?? 0,
+        trustScore: verifiedService.trustScore ?? 0,
+        kycLevel: verifiedService.kycLevel ?? 0,
+        verificationStatus: 'verified',
+        currencies: verifiedService.currencies ?? [],
+        networks: verifiedService.networks ?? [],
+        attributes: verifiedService.attributes ?? [],
+      };
+
+      // 3) Try to publish
+      try {
+        await serviceAdminApi.createConfirmedService(payload);
+      } catch (err: any) {
+        // Axios errors usually store details on err.response.data
+        const msg = String(
+          err?.response?.data?.message ??
+            err?.response?.data?.error ??
+            err?.message ??
+            ''
+        ).toLowerCase();
+
+        const isDuplicate =
+          msg.includes('duplicate') ||
+          msg.includes('exists') ||
+          msg.includes('unique') ||
+          msg.includes('11000');
+
+        if (!isDuplicate) throw err;
+
+        // 4) Fallback: update existing confirmed service (match by slug)
+        const allConfirmed = await serviceAdminApi.getConfirmedServices();
+        const existing = allConfirmed?.data?.find(
+          (s: ServiceConfirmed) => String(s.slug) === String(payload.slug)
+        );
+
+        if (!existing?._id) throw err;
+
+        await serviceAdminApi.updateConfirmedService(existing._id, payload);
+      }
+
+      // 5) Update local state
+      setService(verifiedService);
     } catch (err) {
-      console.error('Failed to update service:', err);
+      console.error('Verify & publish failed:', err);
     } finally {
       setUpdating(false);
     }
@@ -70,8 +139,6 @@ export default function ServiceDetailPage({ params }: DetailProps) {
         return 'bg-emerald-100 text-emerald-800';
       case 'approved':
         return 'bg-blue-100 text-blue-800';
-      case 'scam':
-        return 'bg-red-100 text-red-800';
       default:
         return 'bg-amber-100 text-amber-800';
     }
@@ -111,7 +178,9 @@ export default function ServiceDetailPage({ params }: DetailProps) {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold">{service.name}</h1>
-          <p className="text-slate-600">{service.type} • {service.url}</p>
+          <p className="text-slate-600">
+            {service.type} • {service.url}
+          </p>
         </div>
         <span className={`px-3 py-1 text-xs font-medium rounded-full ${statusClass(service.verificationStatus)}`}>
           {service.verificationStatus}
@@ -180,24 +249,21 @@ export default function ServiceDetailPage({ params }: DetailProps) {
           <div>
             <h2 className="text-sm font-semibold text-slate-500 uppercase mb-2">Currencies</h2>
             <ul className="text-sm text-slate-700 list-disc ml-4">
-              {service.currencies.length ? service.currencies.map((c) => <li key={c}>{c}</li>)
-              : <li className="text-slate-400">None</li>}
+              {service.currencies?.length ? service.currencies.map((c) => <li key={c}>{c}</li>) : <li className="text-slate-400">None</li>}
             </ul>
           </div>
 
           <div>
             <h2 className="text-sm font-semibold text-slate-500 uppercase mb-2">Networks</h2>
             <ul className="text-sm text-slate-700 list-disc ml-4">
-              {service.networks.length ? service.networks.map((n) => <li key={n}>{n}</li>)
-              : <li className="text-slate-400">None</li>}
+              {service.networks?.length ? service.networks.map((n) => <li key={n}>{n}</li>) : <li className="text-slate-400">None</li>}
             </ul>
           </div>
 
           <div>
             <h2 className="text-sm font-semibold text-slate-500 uppercase mb-2">Attributes</h2>
             <ul className="text-sm text-slate-700 list-disc ml-4">
-              {service.attributes.length ? service.attributes.map((a) => <li key={a}>{a}</li>)
-              : <li className="text-slate-400">None</li>}
+              {service.attributes?.length ? service.attributes.map((a) => <li key={a}>{a}</li>) : <li className="text-slate-400">None</li>}
             </ul>
           </div>
         </div>
@@ -209,26 +275,15 @@ export default function ServiceDetailPage({ params }: DetailProps) {
           <div className="flex space-x-2">
             {service.verificationStatus !== 'verified' && (
               <button
-                onClick={() => updateStatus('verified')}
+                onClick={verifyAndPublish}
                 disabled={updating}
                 className="px-4 py-2 bg-emerald-600 text-white text-xs rounded hover:bg-emerald-700 disabled:opacity-60"
               >
                 {updating ? 'Updating...' : 'Verify'}
               </button>
             )}
-
-            {service.verificationStatus !== 'scam' && (
-              <button
-                onClick={() => updateStatus('scam')}
-                disabled={updating}
-                className="px-4 py-2 bg-red-600 text-white text-xs rounded hover:bg-red-700 disabled:opacity-60"
-              >
-                {updating ? 'Updating...' : 'Mark Scam'}
-              </button>
-            )}
           </div>
         </div>
-
       </div>
     </div>
   );

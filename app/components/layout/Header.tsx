@@ -10,7 +10,7 @@ const navItems = [
   { label: "Directory", href: "/directory" },
   { label: "Lizard Pay", href: "/pay" },
   { label: "Partners", href: "/partners" },
-  { label: "Token Request", href: "/tokens/request" },
+  { label: "Token Request", href: "/tokens" },
 ];
 
 export function Header() {

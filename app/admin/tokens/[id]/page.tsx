@@ -280,17 +280,7 @@ export default function TokenRequestDetailPage({
                   : 'Approve'}
               </button>
             )}
-            {request.status !== 'rejected' && (
-              <button
-                onClick={() => updateStatus('rejected')}
-                disabled={updating}
-                className="px-4 py-2 text-xs font-medium text-white bg-red-600 rounded hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {updating && request.status !== 'rejected'
-                  ? 'Updating...'
-                  : 'Reject'}
-              </button>
-            )}
+            
           </div>
         </div>
       </div>

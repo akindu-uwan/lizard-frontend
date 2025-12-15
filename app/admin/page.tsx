@@ -86,9 +86,7 @@ export default function AdminDashboard() {
           <div className="bg-white rounded-xl shadow border border-slate-200 p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-slate-900">Service Requests</h3>
-              <span className="px-2 py-1 text-xs font-medium bg-emerald-100 text-emerald-800 rounded-full">
-                12 pending
-              </span>
+              
             </div>
             <p className="text-sm text-slate-600 mb-4">
               Review and approve Service listing requests submitted by users.
@@ -105,9 +103,7 @@ export default function AdminDashboard() {
           <div className="bg-white rounded-xl shadow border border-slate-200 p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-slate-900">Token Requests</h3>
-              <span className="px-2 py-1 text-xs font-medium bg-emerald-100 text-emerald-800 rounded-full">
-                12 pending
-              </span>
+              
             </div>
             <p className="text-sm text-slate-600 mb-4">
               Review and approve token listing requests submitted by users.
@@ -125,9 +121,7 @@ export default function AdminDashboard() {
           <div className="bg-white rounded-xl shadow border border-slate-200 p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-slate-900">Partner Applications</h3>
-              <span className="px-2 py-1 text-xs font-medium bg-amber-100 text-amber-800 rounded-full">
-                8 pending
-              </span>
+              
             </div>
             <p className="text-sm text-slate-600 mb-4">
               Review and process partner integration requests.

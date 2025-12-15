@@ -66,7 +66,7 @@ export default function AddServicePage() {
 
     try {
       setLoading(true);
-      const createdService = await apiPost("/api/services/request", payload);
+      const createdService = await apiPost("/api/servicerequests", payload);
       setSuccess(`Service "${createdService.name}" created successfully!`);
 
       setTimeout(() => {
