@@ -60,10 +60,18 @@ export const serviceAdminApi = {
 // Partner Admin API
 // ------------------------------------
 export const partnerAdminApi = {
+  // Requests (applications)
   getApplications: () => api.get("/api/partnerrequests"),
   updateApplication: (id: number | string, status: string) =>
     api.put(`/api/partnerrequests/${id}`, { status }),
+
+  // Confirmed / Published partners
+  getConfirmedPartners: () => api.get("/api/partners"),
+  createConfirmedPartner: (data: any) => api.post("/api/partners/apply", data),
+  updateConfirmedPartner: (id: number | string, data: any) =>
+    api.put(`/api/partners/${id}`, data),
 };
+
 
 // ------------------------------------
 // Key Auth API
