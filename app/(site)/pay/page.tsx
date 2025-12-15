@@ -93,7 +93,7 @@ export default function LizardPayPage() {
           expiresMinutes && expiresMinutes > 0 ? expiresMinutes : undefined,
       };
 
-      const resp = await apiPost<PayLinkResponse>("/api/pay-links", payload);
+        const resp = (await apiPost("/api/pay-links", payload)) as PayLinkResponse;
 
       setCreatedLink(resp);
 
