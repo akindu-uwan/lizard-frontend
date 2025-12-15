@@ -275,9 +275,8 @@ export default function TokenRequestDetailPage({
                 disabled={updating}
                 className="px-4 py-2 text-xs font-medium text-white bg-emerald-600 rounded hover:bg-emerald-700 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {updating && request.status !== 'approved'
-                  ? 'Updating...'
-                  : 'Approve'}
+                {updating ? 'Updating...' : 'Approve'}
+
               </button>
             )}
             
