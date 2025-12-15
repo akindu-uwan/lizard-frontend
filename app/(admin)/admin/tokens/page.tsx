@@ -8,10 +8,11 @@ interface TokenRequest {
   _id: number;
   tokenName: string;
   tokenSymbol: string;
-  status: string;
+  status: "pending" | "approved" | "rejected";
   submittedAt: string;
   requesterEmail: string;
 }
+
 
 export default function TokenAdminPage() {
   const [requests, setRequests] = useState<TokenRequest[]>([]);
