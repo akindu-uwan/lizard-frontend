@@ -52,7 +52,6 @@ export default function PartnerApplyPage() {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [partnersLoading, setPartnersLoading] = useState(true);
 
-  // UI-only: collapse advanced fields so it feels minimal
   const [showIntegration, setShowIntegration] = useState(false);
   const [showSocial, setShowSocial] = useState(false);
   const [showOps, setShowOps] = useState(false);
@@ -71,17 +70,15 @@ export default function PartnerApplyPage() {
     },
   });
 
-  // Live preview chips (small, minimal)
   const wProject = watch("projectName");
   const wType = watch("serviceType");
   const wChain = watch("primaryChain");
 
-  // load approved partners preview
   useEffect(() => {
     async function fetchPartners() {
       try {
         setPartnersLoading(true);
-        const data = await apiGet<Partner[]>("/api/partners?status=approved");
+            const data = (await apiGet("/api/partners?status=approved")) as Partner[];
         setPartners(data);
       } catch (err) {
         console.error("Failed to load partners", err);

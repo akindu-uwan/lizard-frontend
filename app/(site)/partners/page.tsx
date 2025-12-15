@@ -22,7 +22,6 @@ export default function PartnersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // minimal “product-feel” controls
   const [q, setQ] = useState("");
   const [approvedOnly, setApprovedOnly] = useState(false);
 
@@ -60,7 +59,6 @@ export default function PartnersPage() {
       list = list.filter((p) => p.status === "approved");
     }
 
-    // keep approved first for better UX
     list.sort((a, b) => {
       const aScore = a.status === "approved" ? 2 : a.status === "pending" ? 1 : 0;
       const bScore = b.status === "approved" ? 2 : b.status === "pending" ? 1 : 0;
