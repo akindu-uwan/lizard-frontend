@@ -46,15 +46,30 @@ export const tokenAdminApi = {
 // Service Admin API
 // ------------------------------------
 export const serviceAdminApi = {
+  // 🔹 Service requests (applications)
   getServices: () => api.get('/api/servicerequests'),
+
   getRequestServiceById: (id: number | string) =>
     api.get(`/api/servicerequests/${id}`),
+
   updateServices: (id: number | string, data: any) =>
     api.put(`/api/servicerequests/${id}`, data),
 
+  // ✅ Alias used by your UI page (so build passes)
+  getServiceById: (id: number | string) =>
+    api.get(`/api/servicerequests/${id}`),
+
+  // 🔹 Confirmed services (published)
   createConfirmedService: (data: any) =>
     api.post('/api/services', data),
+
+  getConfirmedServices: () =>
+    api.get('/api/services'),
+
+  updateConfirmedService: (id: number | string, data: any) =>
+    api.put(`/api/services/${id}`, data),
 };
+
 
 // ------------------------------------
 // Partner Admin API
