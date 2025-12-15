@@ -2,7 +2,7 @@
 
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { serviceAdminApi } from '@/app/api/admin/route';
+import { serviceAdminApi } from '@/app/lib/adminApi';
 
 type VerificationStatus = 'verified' | 'approved' | 'community';
 

@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from "@/app/api/directory/route";
+import { apiGet, apiPost } from "@/app/lib/http";
 
 export type MeResponse = { user: { id: string; label?: string } };
 

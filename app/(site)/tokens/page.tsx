@@ -10,7 +10,7 @@ import {
   Check,
   ShieldCheck,
 } from "lucide-react";
-import { apiGet } from "@/app/api/directory/route";
+import { apiGet } from "@/app/lib/http";
 import { Card } from "@/app/components/ui/Card";
 import { Button } from "@/app/components/ui/Button";
 import { cn } from "@/app/components/ui/cn";

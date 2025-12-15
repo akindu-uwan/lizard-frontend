@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { tokenAdminApi } from '@/app/api/admin/route';
+import { tokenAdminApi } from '@/app/lib/adminApi';
 
 interface TokenRequest {
   _id: number;

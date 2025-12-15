@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { keyAuthApi } from "@/app/api/admin/route";
+import { keyAuthApi } from "@/app/lib/adminApi";
 
 export default function SignupPage() {
   const router = useRouter();

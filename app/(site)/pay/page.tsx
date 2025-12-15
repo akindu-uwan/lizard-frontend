@@ -13,7 +13,7 @@ import {
 import { Card } from "@/app/components/ui/Card";
 import { Button } from "@/app/components/ui/Button";
 import { cn } from "@/app/components/ui/cn";
-import { apiPost } from "@/app/api/directory/route";
+import { apiPost } from "@/app/lib/http";
 
 type PayLinkResponse = {
   id: string;

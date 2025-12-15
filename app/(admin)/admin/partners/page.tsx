@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { partnerAdminApi } from "@/app/api/admin/route";
+import { partnerAdminApi } from "@/app/lib/adminApi";
 
 interface PartnerApplication {
   _id: string;

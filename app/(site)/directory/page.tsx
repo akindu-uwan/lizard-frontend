@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect } from "react";
 import { ChevronDown, Search, ShieldCheck, Sparkles, SlidersHorizontal } from "lucide-react";
-import { apiGet } from "@/app/api/directory/route";
+import { apiGet } from "@/app/lib/http";
 import { Service } from "@/app/types/service";
 import Link from "next/link";
 

@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { cn } from "@/app/components/ui/cn";
 import { Button } from "@/app/components/ui/Button";
-import { keyAuthApi } from "@/app/api/admin/route";
+import { keyAuthApi } from "@/app/lib/adminApi";
 
 const navItems = [
   { label: "Swap", href: "/swap" },

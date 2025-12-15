@@ -12,7 +12,7 @@ import {
   Mail,
   Cpu,
 } from "lucide-react";
-import { apiPost, apiGet } from "@/app/api/directory/route";
+import { apiPost, apiGet } from "@/app/lib/http";
 import { Card } from "@/app/components/ui/Card";
 import { Button } from "@/app/components/ui/Button";
 import { cn } from "@/app/components/ui/cn";

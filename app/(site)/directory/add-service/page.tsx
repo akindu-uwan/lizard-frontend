@@ -4,7 +4,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown, PlusCircle } from "lucide-react";
 import Link from "next/link";
-import { apiPost } from "@/app/api/directory/route";
+import { apiPost } from "@/app/lib/http";
 
 type ServiceType = "exchange" | "wallet" | "vpn" | "hosting" | "other" | "aggregator" | "bridge" | "tool";
 

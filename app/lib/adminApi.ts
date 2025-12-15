@@ -1,8 +1,7 @@
 'use client';
 
 import axios from 'axios';
-import { apiGet, apiPost } from "@/app/api/directory/route";
-
+import { apiGet, apiPost } from "@/app/lib/http";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -15,10 +14,8 @@ const api = axios.create({
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      if (typeof window !== 'undefined') {
-        window.location.href = '/admin/login';
-      }
+    if (error.response?.status === 401 && typeof window !== 'undefined') {
+      window.location.href = '/admin/login';
     }
     return Promise.reject(error);
   }
@@ -37,7 +34,7 @@ export const authApi = {
 };
 
 // ------------------------------------
-// Token Admin API (unchanged)
+// Token Admin API
 // ------------------------------------
 export const tokenAdminApi = {
   getRequests: () => api.get('/api/tokenrequests'),
@@ -46,70 +43,41 @@ export const tokenAdminApi = {
 };
 
 // ------------------------------------
-// Service Admin API (FIXED + EXTENDED)
+// Service Admin API
 // ------------------------------------
 export const serviceAdminApi = {
-  // 🔹 Service requests
   getServices: () => api.get('/api/servicerequests'),
-
   getRequestServiceById: (id: number | string) =>
     api.get(`/api/servicerequests/${id}`),
-
-  updateServices: (
-    id: number | string,
-    data: Partial<{ verificationStatus: string }>
-  ) =>
+  updateServices: (id: number | string, data: any) =>
     api.put(`/api/servicerequests/${id}`, data),
-
-  // 🔹 Confirmed services (published)
-
-  getServiceById: (id: number | string) =>
-    api.get(`/api/servicerequests/${id}`),
 
   createConfirmedService: (data: any) =>
     api.post('/api/services', data),
-
-  getConfirmedServices: () =>
-    api.get('/api/services'),
-
-  updateConfirmedService: (id: number | string, data: any) =>
-    api.put(`/api/services/${id}`, data),
 };
 
-
-
 // ------------------------------------
-// Partner Admin API (EXTENDED for publish flow)
+// Partner Admin API
 // ------------------------------------
 export const partnerAdminApi = {
-  // Requests (applications)
   getApplications: () => api.get("/api/partnerrequests"),
   updateApplication: (id: number | string, status: string) =>
     api.put(`/api/partnerrequests/${id}`, { status }),
-
-  // Confirmed / Published partners
-  getConfirmedPartners: () => api.get("/api/partners"),
-  createConfirmedPartner: (data: any) => 
-    api.post("/api/partners/apply", data),
-  updateConfirmedPartner: (id: number | string, data: any) =>
-    api.put(`/api/partners/${id}`, data),
 };
 
+// ------------------------------------
+// Key Auth API
+// ------------------------------------
 export const keyAuthApi = {
-  // Signup: generates login key ONCE + sets cookie
   register: (label?: string) =>
     apiPost("/api/auth/key/register", { label }),
 
-  // Login: paste key + sets cookie
   login: (loginKey: string) =>
     apiPost("/api/auth/key/login", { loginKey }),
 
-  // Who am I (session check)
   me: () => apiGet("/api/auth/me"),
 
-  // Logout
   logout: () => apiPost("/api/auth/logout", {}),
 };
-
 
 export default api;

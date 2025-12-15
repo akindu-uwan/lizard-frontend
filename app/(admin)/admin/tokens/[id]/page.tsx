@@ -2,7 +2,7 @@
 
 import React, { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { tokenAdminApi } from '@/app/api/admin/route';
+import { tokenAdminApi } from '@/app/lib/adminApi';
 
 type TokenStatus = 'pending' | 'approved' | 'rejected';
 type TokenType = 'ERC20' | 'BEP20' | 'SPL' | 'Other';

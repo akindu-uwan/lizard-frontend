@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { authApi } from "@/app/api/admin/route";
+import { authApi } from "@/app/lib/adminApi";
 import {
   ShieldCheck,
   LayoutDashboard,

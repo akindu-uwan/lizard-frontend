@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 
 // ✅ change this import (use authApi for email/password login)
-import { authApi } from "@/app/api/admin/route";
+import { authApi } from "@/app/lib/adminApi";
 
 import {
   AlertTriangle,

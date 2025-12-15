@@ -2,7 +2,7 @@
 
 import React, { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { partnerAdminApi } from "@/app/api/admin/route";
+import { partnerAdminApi } from "@/app/lib/adminApi";
 
 type PartnerStatus = "pending" | "approved" | "rejected";
 type ServiceType = "DEX" | "Aggregator" | "Bridge" | "Lending" | "Wallet" | "Other";
