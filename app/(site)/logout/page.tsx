@@ -1,14 +1,21 @@
 "use client";
+
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { registerKey } from "../lib/auth";
+import { keyAuthApi } from "@/app/lib/adminApi";
 
 export default function LogoutPage() {
   const router = useRouter();
 
   useEffect(() => {
     (async () => {
-      try { await logout(); } finally { router.push("/"); }
+      try {
+        await keyAuthApi.logout();
+      } catch (e) {
+        console.error("Logout failed:", e);
+      } finally {
+        router.push("/");
+      }
     })();
   }, [router]);
 
