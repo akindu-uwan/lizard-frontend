@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { keyAuthApi } from "@/app/lib/adminApi";
+import { authApi } from "@/app/lib/adminApi";
 import {
   AlertTriangle,
   Lock,
@@ -42,7 +42,7 @@ export default function LoginClient() {
     setIsSubmitting(true);
     try {
       // keep your existing login flow
-      await keyAuthApi.login(`${data.email}:${data.password}`);
+      await authApi.login(`${data.email}:${data.password}`);
       router.push(redirectTo);
     } catch (err: any) {
       setSubmitError(
