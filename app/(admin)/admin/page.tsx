@@ -16,11 +16,12 @@ import {
 } from "lucide-react";
 import { Card } from "@/app/components/ui/Card";
 import { Button } from "@/app/components/ui/Button";
-import { cn } from "@/app/components/ui/cn";
 
 interface AdminStatus {
   isAuthenticated: boolean;
   email?: string;
+  // ✅ derived client-side (your backend doesn't return it)
+  isAdmin?: boolean;
 }
 
 function initials(email?: string) {
@@ -34,21 +35,44 @@ function initials(email?: string) {
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const [adminStatus, setAdminStatus] = useState<AdminStatus | null>(null);
+  const [adminStatus, setAdminStatus] = useState<AdminStatus>({
+    isAuthenticated: false,
+    email: "",
+    isAdmin: false,
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    checkAuth();
+    void checkAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkAuth = async () => {
     try {
       const response = await authApi.checkStatus();
-      setAdminStatus(response.data);
+
+      // ✅ Always normalize to an object (never allow undefined/null)
+      const data = (response?.data ?? {}) as Partial<AdminStatus>;
+      const isAuthenticated = !!data.isAuthenticated;
+      const email = typeof data.email === "string" ? data.email : "";
+
+      // ✅ derive isAdmin from session-auth status (no backend change needed)
+      const nextStatus: AdminStatus = {
+        isAuthenticated,
+        email,
+        isAdmin: isAuthenticated,
+      };
+
+      setAdminStatus(nextStatus);
+
+      // ✅ if not authenticated, redirect now
+      if (!isAuthenticated) {
+        router.push(`/admin/login?redirect=${encodeURIComponent("/admin")}`);
+      }
     } catch (error) {
       console.error("Auth check failed:", error);
-      router.push("/admin/login");
+      setAdminStatus({ isAuthenticated: false, email: "", isAdmin: false });
+      router.push(`/admin/login?redirect=${encodeURIComponent("/admin")}`);
     } finally {
       setLoading(false);
     }
@@ -57,9 +81,10 @@ export default function AdminDashboard() {
   const handleLogout = async () => {
     try {
       await authApi.logout();
-      router.push("/admin/login");
     } catch (error) {
       console.error("Logout failed:", error);
+    } finally {
+      router.push("/admin/login");
     }
   };
 
@@ -159,7 +184,7 @@ export default function AdminDashboard() {
                 Session active
               </div>
               <div className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-slate-600 ring-1 ring-slate-200">
-                {adminStatus?.isAuthenticated ? "Authenticated" : "Unknown"}
+                {adminStatus?.isAuthenticated ? "Authenticated" : "Not authenticated"}
               </div>
             </div>
           </div>
