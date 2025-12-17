@@ -41,8 +41,8 @@ export default function LoginClient() {
     setSubmitError(null);
     setIsSubmitting(true);
     try {
-      // keep your existing login flow
-      await authApi.login(`${data.email}:${data.password}`);
+      
+        await authApi.login(data.email, data.password);
       router.push(redirectTo);
     } catch (err: any) {
       setSubmitError(
